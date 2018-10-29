@@ -1,0 +1,89 @@
+
+import java.math.BigInteger;
+import java.util.Random;
+
+public class Sender {
+
+	private int message;
+	private int hash;
+	private Packet pk;
+	private int ks;
+
+
+
+	public Sender() {
+		System.out.println("----Sender is created-----");
+
+		//First value is message, second value is signature, third value is session key. 
+
+		// Message = string to BigInt
+		//signature = 
+		pk = new Packet(new BigInteger("13"), new BigInteger("2"),new BigInteger("5"));
+		System.out.println("The test packet to be sent to network is :\n " + pk.toString());
+	}
+
+
+	//Generates random message
+	public void generateMessage()
+	{
+		Random rn = new Random();
+		message = rn.nextInt(1000) + 1;
+
+		System.out.println("The message is: " + message);
+
+
+	}
+
+
+	//Generates a random hash between 1 and 19. Then assigns it to a variable that is
+	//known by both the sender and the recipient. 
+	public void generateHash()
+	{
+		Random rn = new Random();
+		hash = rn.nextInt(19) + 1;
+		
+		//This checks and makes sure that after hashing, the message cannot equal 0.
+		
+		if (message % hash == 0)
+		{
+			hash++;
+		}
+
+		System.out.println("The hash is: " + hash);
+	}
+
+	//After generating a random message, hashes it with the randomly generated hash
+	//function.
+	public int hashMessage()
+	{
+		message = message % hash;
+		System.out.println("The hashed message is: " + message);
+		
+		return message;
+	}
+
+
+	public void generateKs()
+	{
+
+	}
+
+	//Passes the pk to the Network class.
+	public void sendPacketToNetwork(Network n)
+	{
+		System.out.println("------Sender sends the test packet to Reciever through internet------");
+		System.out.println("");
+		n.inFromSender = pk;
+
+	}
+
+
+	public Packet getPacket(){
+
+		return pk;
+
+	}
+
+
+
+}
