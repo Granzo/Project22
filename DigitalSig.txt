@@ -1,0 +1,34 @@
+import java.math.BigInteger;
+import java.math.*;
+
+public class DigitalSignature 
+{
+	
+	
+	RSA rsaCipher;
+	
+	public DigitalSignature (RSA rsa) 
+	{
+		rsaCipher = rsa;
+	}
+		
+	public BigInteger encrypt (int msg)
+	{
+		BigInteger eMessage;
+		System.out.println(msg);
+		long message = msg;
+		
+		
+		int d = rsaCipher.getD().intValue();
+		int n = rsaCipher.getN().intValue();
+		
+		
+		message = (long) (Math.pow(message, d) % n);
+	
+		eMessage = BigInteger.valueOf(message);
+	
+		
+		return eMessage;
+	}
+
+}
