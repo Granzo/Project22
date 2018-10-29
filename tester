@@ -1,0 +1,56 @@
+import java.math.BigInteger;
+
+public class tester 
+{
+	
+	private static String bytesToString(byte[] encrypted)
+	{
+		String test = "";
+		for (byte b : encrypted)
+		{
+			test += Byte.toString(b);
+		}
+		return test;
+	}
+	
+	public static void main (String [] args)
+	{
+		System.out.println("Test 1: Given Code............................................................................................................");
+		//Test 1: Given Code
+		Sender sender1 = new Sender();
+		Receiver receiver1 = new Receiver();
+		Network network1 = new Network();
+		
+		sender1.sendPacketToNetwork(network1);
+		network1.setInternetCondition(0);
+		network1.sendToReceiver();
+		receiver1.receive(network1);
+		System.out.println("");
+		
+		System.out.println("Test 2: No Network Attack: RSA, Hash, DS, MAC, ShiftCipher ............................................................................................................");
+		//Test 2: RSA, 
+		Sender sender2 = new Sender();
+		Receiver receiver2 = new Receiver();
+		Network network2 = new Network();
+		RSA rsa = new RSA();
+		DigitalSignature ds = new DigitalSignature(rsa);
+		rsa.getPublicKey();
+		rsa.getPrivateKey();
+		
+		sender2.generateMessage();
+		sender2.generateHash();
+		System.out.println(ds.encrypt(sender2.hashMessage()));
+		
+		System.out.println("Test 3: No Network Attack: RSA, Hash, DS, MAC, ShiftCipher ............................................................................................................");
+		
+	
+		
+		
+	
+		
+		
+		
+	
+		
+	}
+}
