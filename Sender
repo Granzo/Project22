@@ -4,32 +4,80 @@ import java.util.Random;
 
 public class Sender {
 
-	private int message;
 	private int hash;
 	private Packet pk;
-	private int ks;
+	private BigInteger ks;
+	BigInteger biMessage;
+	private String msg;
+
+
+	private BigInteger fMessage;
+	private BigInteger signature;
+	private BigInteger sessionKey;
+
 
 
 
 	public Sender() {
 		System.out.println("----Sender is created-----");
 
+	}
+
+	public Sender(String test) 
+	{
+		System.out.println("----Sender is created-----");
+
 		//First value is message, second value is signature, third value is session key. 
 
 		// Message = string to BigInt
 		//signature = 
+
 		pk = new Packet(new BigInteger("13"), new BigInteger("2"),new BigInteger("5"));
+		fMessage = new BigInteger("2");
+		signature = new BigInteger("5");
+		sessionKey = new BigInteger("13");
 		System.out.println("The test packet to be sent to network is :\n " + pk.toString());
 	}
 
 
-	//Generates random message
-	public void generateMessage()
-	{
-		Random rn = new Random();
-		message = rn.nextInt(1000) + 1;
 
-		System.out.println("The message is: " + message);
+
+
+	//Used to input a personalized message aside from normal generation to be used
+	//all alphabetic ciphers. 
+	public BigInteger decideMessage(String msg)
+	{
+		this.msg = msg;
+
+		String result = "";
+
+		//Creates a loop to process through the string. 
+		for (int i = 0; i < msg.length(); i++) 
+		{
+
+			char ch = msg.charAt(i);
+
+			result += (ch + 0); // add 0 to make all chars into numerical values
+
+			// Then finally, print out the result and the corresponding character for each result. 
+			System.out.println("\tch = " + ch + ", result = " + result);
+
+
+
+		}
+		BigInteger iMessage = new BigInteger(result);
+
+		System.out.println("The message is: " + msg);
+		System.out.println("The message as a bigInteger is " + iMessage);
+
+		biMessage = new BigInteger(result);
+
+		System.out.println(biMessage);
+		
+		return iMessage;
+
+
+
 
 
 	}
@@ -40,32 +88,56 @@ public class Sender {
 	public void generateHash()
 	{
 		Random rn = new Random();
-		hash = rn.nextInt(19) + 1;
-		
+		hash = rn.nextInt(13) + 1;
+		BigInteger biHash;
+
+
 		//This checks and makes sure that after hashing, the message cannot equal 0.
-		
-		if (message % hash == 0)
+
+		do 
 		{
+			biHash = BigInteger.valueOf(hash);
 			hash++;
+
+
+
 		}
 
-		System.out.println("The hash is: " + hash);
+		while (biMessage.mod(biHash).equals(BigInteger.ZERO) || biMessage.mod(biHash).equals(BigInteger.ONE));
+
+		System.out.println("The hash, known by both the sender and the recipient is: " + hash);
 	}
 
 	//After generating a random message, hashes it with the randomly generated hash
 	//function.
-	public int hashMessage()
+	public BigInteger hashMessage()
 	{
-		message = message % hash;
-		System.out.println("The hashed message is: " + message);
-		
-		return message;
+
+
+		//message = message % hash;
+
+		BigInteger biHash = BigInteger.valueOf(hash);
+
+		BigInteger hashedMessage = biMessage.mod(biHash);
+
+
+		System.out.println("The hashed message is: " + hashedMessage);
+		biMessage = hashedMessage;
+
+		return hashedMessage;
 	}
 
 
 	public void generateKs()
 	{
+		Random rn = new Random();
 
+		//Generates a random ks between 1 and 5.
+		int ks = rn.nextInt(5) + 1;
+
+		//After randomization, assigns KS to its BigInteger counterpart.
+		this.ks = BigInteger.valueOf(ks);
+		System.out.println("The Ks known by the sender is " + ks);
 	}
 
 	//Passes the pk to the Network class.
@@ -73,8 +145,19 @@ public class Sender {
 	{
 		System.out.println("------Sender sends the test packet to Reciever through internet------");
 		System.out.println("");
+
+		pk.setMessage(fMessage);
+		pk.setSessionKey(sessionKey);
+		pk.setSignature(signature);
+		System.out.println("The packet to be sent to network is :\n " + pk.toString());
+
 		n.inFromSender = pk;
 
+	}
+
+	public BigInteger getKs()
+	{
+		return ks;
 	}
 
 
@@ -84,6 +167,47 @@ public class Sender {
 
 	}
 
+	public int getHash()
+	{
 
+		return hash;
+
+	}
+
+	//These are the final sets used for composing the final sendable packet
+	public void setPacketMessage()
+	{
+		pk.setMessage(biMessage);
+	}
+
+	public void setPacketSignature(BigInteger sig)
+	{
+		signature = sig;
+	}
+
+	public void toShiftCipher(ShiftCipher s_cipher, BigInteger ks)
+	{
+		msg = s_cipher.encrypt(this.msg, this.ks);
+
+
+		System.out.println(msg);
+		decideMessage(msg);
+	}
+
+	public void encryptSessionKey(BigInteger n, BigInteger e)
+	{
+		int eint = e.intValue();
+		int nint = n.intValue();
+
+		sessionKey = ks.modPow(e, n);
+	}
+
+
+	//Needed for fixing weird error.
+	public void setBiMessage(BigInteger msg)
+	{
+		biMessage = msg;
+	}
 
 }
+
