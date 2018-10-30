@@ -1,0 +1,233 @@
+import java.math.BigInteger;
+
+public class MAC implements MACADT
+{
+
+	//Used to save these values to be utilizied later for decrypting
+	private BigInteger privateKey;
+	private BigInteger messageExtract;
+	private BigInteger hash;
+	private BigInteger messageFinal;
+
+	
+
+
+
+	//Represents the original secret.
+	private char Osecret;
+
+	@Override
+	public BigInteger encrypt(String msg, char secret, BigInteger hash) 
+	{
+		//First, store valus to be used later
+		this.hash = hash;
+
+		Osecret = secret;
+
+		//Create a string result that will be used to hold the values of each character in the message
+		String result = "";
+
+		//Creates a loop to process through the string. 
+		for (int i = 0; i < msg.length(); i++) 
+		{
+
+			char ch = msg.charAt(i);
+
+			result += (ch + 0); // add 0 to make all chars into numerical values
+
+			// Then finally, print out the result and the corresponding character for each result. 
+			System.out.println("\tch = " + ch + ", result = " + result);
+
+
+		}
+		// Saves the messageExtract or the original message pre insertion. 
+		messageExtract = new BigInteger(result);
+
+		//Creates a string to save the result after adding the secret
+		String resultPost = result;
+
+		System.out.println("Add 'S' value to begininning");
+		System.out.println("s= " + (secret+0));
+
+		//Once again, adding 0 to convert the char into a number. 
+		result = (secret+0) + result;
+
+		//Print the result of the message after adding the secret character numerical value to the front. 
+		System.out.println(result);
+
+		//Then, after fully calculating the result, hash it using the user-input hash, then save it
+		//it as the private key for decypting.
+		privateKey = new BigInteger(result).mod(hash);
+
+		//Finally, prints the final message, assigns it to the string, then returns the new finalized result. 
+		System.out.println("Post Hashing, Final Message is:");
+		resultPost = ((privateKey.toString()) + resultPost);
+		System.out.println(resultPost);
+		
+		System.out.println("Hi ");
+
+
+		return new BigInteger(resultPost);
+
+
+	}
+
+
+	public BigInteger encrypt(BigInteger msg, char secret, BigInteger h) 
+	{
+		
+		
+		//First, store valus to be used later
+		this.hash = h;
+
+		Osecret = secret;
+		System.out.println(hash);
+		//Create a string result that will be used to hold the values of each character in the message
+
+
+		messageExtract = msg;
+
+		//This will be used to store the message before any additions are made onto it.
+		String preHash = messageExtract.toString();
+
+		//Creates a string to save the result after adding the secret
+		String resultPost =  messageExtract.toString();
+
+
+		System.out.println("Add 'S' value to begininning");
+		System.out.println("s= " + (secret+0));
+
+		//Once again, adding 0 to convert the char into a number. 
+		resultPost = (secret+0) + resultPost;
+
+		//Print the result of the message after adding the secret character numerical value to the front. 
+		System.out.println(resultPost);
+
+		//Then, after fully calculating the result, hash it using the user-input hash, then save it
+		//it as the private key for decypting.
+		privateKey = new BigInteger(resultPost).mod(hash);
+
+		//Finally, prints the final message, assigns it to the string, then returns the new finalized result. 
+		System.out.println("Post Hashing, final Message is: ");
+		resultPost = ((privateKey.toString()) + preHash);
+		System.out.print(resultPost);
+		
+		
+		
+		messageFinal = new BigInteger(resultPost);
+		
+		
+		
+
+
+		return new BigInteger(resultPost);
+
+
+	}
+	
+	public void backToSender(Sender sndr)
+	{
+		sndr.setBiMessage(messageFinal);
+		System.out.println("The final message is :" + messageFinal );
+	}
+	
+	//	public BigInteger encrypt(int msg, char secret, BigInteger hash) 
+	//	{
+	//		//First, store valus to be used later
+	//		this.hash = hash;
+	//
+	//		Osecret = secret;
+	//
+	//		
+	//		String result = "";
+	//		
+	//		//Converts the msg to a string.
+	//		result = Integer.toString(msg);
+	//
+	//		//Creates a loop to process through the string. 
+	//	
+	//		messageExtract = new BigInteger(result);
+	//
+	//		//Creates a string to save the result after adding the secret
+	//		String resultPost = result;
+	//
+	//		System.out.println("Add 'S' value to begininning");
+	//		System.out.println("s= " + (secret+0));
+	//
+	//		//Once again, adding 0 to convert the char into a number. 
+	//		result = (secret+0) + result;
+	//
+	//		//Print the result of the message after adding the secret character numerical value to the front. 
+	//		System.out.println(result);
+	//		
+	//		System.out.println("The current hash is " + hash);
+	//
+	//		//Then, after fully calculating the result, hash it using the user-input hash, then save it
+	//		//it as the private key for decypting.
+	//		privateKey = new BigInteger(result).mod(hash);
+	//
+	//		//Finally, prints the final message, assigns it to the string, then returns the new finalized result. 
+	//		System.out.println("Post Hashing, Final Message is:");
+	//		resultPost = ((privateKey.toString()));
+	//		System.out.println(resultPost);
+	//
+	//
+	//		return new BigInteger(resultPost);
+	//
+	//
+	//	}
+
+	@Override
+	public void decrypt(BigInteger msg, int origSecret) 
+	{
+		//Flavortext.
+		System.out.println("----------------------Sending to recipient...----------------------");
+
+		System.out.println("Recieved messaged: " + msg);
+		System.out.println("Extracting...");
+		//Using the previously stored message extract, extracts the original message without the
+		//secret character. 
+		System.out.println("Original msg = " + messageExtract);
+		System.out.println("Applying secret...");
+
+		//After extracting the original message without the secret, places the calculated secret
+		//in front of the message, since this is the known privatekey of the indiviudal. 
+		BigInteger appliedS = BigInteger.valueOf(Osecret + 0);
+
+		//Then of course, prints it. 
+		System.out.println(appliedS);
+
+		//Next, takes the new scret with the applied S to it, then place it in front of the original
+		//message, (or the message extract), and changes appliedS to the combined version. 
+		appliedS = new BigInteger(appliedS.toString() + messageExtract.toString());
+
+		//Prints the value + some flavor text.
+		System.out.println(appliedS);
+		System.out.println("Hashing...");
+
+		//Next, mods the fully calculated number and calculated S with the original known hashing value
+		//after calculating the secret. 
+		BigInteger calculatedSecret = appliedS.mod(hash);
+		System.out.println("Hashed message = " + appliedS.mod(hash));
+		System.out.println("");
+
+		//Lastly, if the calculated secret value matches the original, the system "accepts the message"
+		if (calculatedSecret.intValue() == origSecret)
+		{
+			System.out.println("Original message key matches calculated key");
+			System.out.println("Message accepted!");
+
+		}
+		// and if not, the message is discarded. 
+		if (calculatedSecret.intValue() != origSecret)
+		{
+			System.out.println("Original message key does not match calculated key");
+			System.out.println("Message discarded.");
+			//Discarding
+			messageExtract = null;
+			hash = null;
+			privateKey = null; 
+		}
+
+	}
+}
