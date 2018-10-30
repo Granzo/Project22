@@ -1,56 +1,63 @@
 import java.math.BigInteger;
 
-public class tester 
+public class RSA_HASH_SHIFTC_MAC_CA 
 {
-	
-	private static String bytesToString(byte[] encrypted)
-	{
-		String test = "";
-		for (byte b : encrypted)
-		{
-			test += Byte.toString(b);
-		}
-		return test;
-	}
-	
 	public static void main (String [] args)
 	{
-		System.out.println("Test 1: Given Code............................................................................................................");
-		//Test 1: Given Code
-		Sender sender1 = new Sender();
-		Receiver receiver1 = new Receiver();
-		Network network1 = new Network();
-		
-		sender1.sendPacketToNetwork(network1);
-		network1.setInternetCondition(0);
-		network1.sendToReceiver();
-		receiver1.receive(network1);
-		System.out.println("");
-		
+
+
 		System.out.println("Test 2: No Network Attack: RSA, Hash, DS, MAC, ShiftCipher ............................................................................................................");
 		//Test 2: RSA, 
 		Sender sender2 = new Sender();
-		Receiver receiver2 = new Receiver();
 		Network network2 = new Network();
-		RSA rsa = new RSA();
-		DigitalSignature ds = new DigitalSignature(rsa);
-		rsa.getPublicKey();
-		rsa.getPrivateKey();
+		MAC mac1 = new MAC();
+
+		//Sender
+		RSA rsa1 = new RSA();
+
+		//Reciever
+		RSA rsa2 = new RSA();
+		ShiftCipher shiftCipher1 = new ShiftCipher();
+		DigitalSignature ds1 = new DigitalSignature(rsa1);
+
+		CA ca1 = new CA(rsa1);
+
+		rsa1.getPublicKey();
+		rsa1.getPrivateKey();
+
+		sender2.decideMessage("cis");
 		
-		sender2.generateMessage();
+		
 		sender2.generateHash();
-		System.out.println(ds.encrypt(sender2.hashMessage()));
+		sender2.generateKs();
+		System.out.println("----------Putting message through shiftCipher....----------");
+		System.out.print("Shifted message is : ");
+		sender2.toShiftCipher(shiftCipher1, sender2.getKs());
 		
-		System.out.println("Test 3: No Network Attack: RSA, Hash, DS, MAC, ShiftCipher ............................................................................................................");
-		
-	
-		
-		
-	
-		
-		
-		
-	
-		
+		mac1.backToSender(sender2);
+		System.out.println(ds1.encrypt(sender2.hashMessage(), sender2));
+		ds1.encryptMAC(mac1, sender2);
+
+		BigInteger n = new BigInteger("32");
+		BigInteger e = new BigInteger("4");
+
+		byte[] caN = ca1.getRSACipher().decrypt(n.toString().getBytes());
+		byte[] caE = ca1.getRSACipher().decrypt(e.toString().getBytes());
+		ca1.certify(caN, caE);
+		BigInteger[] caResult = ca1.certify(caN, caE);
+		System.out.print("N = ");
+		System.out.println(caResult[0].toString());
+		System.out.print("E = ");
+		System.out.println(caResult[1].toString());
+
+		Receiver receiver2 = new Receiver();
+		rsa2.getPublicKey();
+		rsa2.getPrivateKey();
+		sender2.encryptSessionKey(rsa2.getN(), rsa2.getE());
+		sender2.sendPacketToNetwork(network2);
+
+
 	}
+
+
 }
