@@ -1,34 +1,77 @@
 import java.math.BigInteger;
 import java.math.*;
-
+/* <p>Cryptography 
+ * This is the incompleted DigitialSignature class implemented to calculate and ultilize digitalSignatures
+ * @author <Ravon Gibson>
+ * @date <9/30/2018>
+ */
+//I was unable to complete my code due to me not understanding how to properly implement DigitalSignature.
 public class DigitalSignature 
 {
 	
-	
+	private BigInteger encryptedMessage;
 	RSA rsaCipher;
+	Sender sender;
+	private int hash;
+	private Packet pkt;
 	
-	public DigitalSignature (RSA rsa) 
+	
+	public DigitalSignature(RSA rsa) 
 	{
-		rsaCipher = rsa;
+		this.rsaCipher = rsa;
 	}
-		
-	public BigInteger encrypt (int msg)
+
+
+	public BigInteger encrypt (BigInteger msg, Sender sndr)
 	{
-		BigInteger eMessage;
-		System.out.println(msg);
-		long message = msg;
+		
+	//First, takes the message and assigns it to a bigInt value
+		BigInteger message = msg;
 		
 		
+		
+		//Then, assign D and N to variables, since they are used for the private key
+		//which is used for DS
 		int d = rsaCipher.getD().intValue();
 		int n = rsaCipher.getN().intValue();
 		
+		//Then, assign n to a bigInteger because otherwise, cant do BigInteger
+		//Multiplication and modding
+		BigInteger nBig = BigInteger.valueOf(n);
 		
-		message = (long) (Math.pow(message, d) % n);
-	
-		eMessage = BigInteger.valueOf(message);
-	
 		
-		return eMessage;
+		//Finally, calculate the message with the digital signature and return it
+		message = message.pow(d).mod(nBig);
+	
+		encryptedMessage = message;
+		
+		System.out.print("Generated Digitial Signature : ");
+		
+		
+		
+		this.sender = sndr;
+		
+		
+		return encryptedMessage;
+	}
+	
+	public void encryptMAC(MAC mac, Sender sndr)
+	{
+		
+	
+		this.sender = sndr;
+		
+		//Gets the hash from the sender to be used for encrypting.
+		hash = sender.getHash();
+		
+		//Then, converts the hash to a bigInteger
+		BigInteger biHash = BigInteger.valueOf(hash);
+		
+		//Finally, takes the BigInteger message and converts it into an int for
+		//easier conversion
+		
+		mac.encrypt(encryptedMessage, 's', biHash);
+		
 	}
 
 }
