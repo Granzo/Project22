@@ -1,3 +1,2 @@
 # Project22
-
-For some reason, I keep recieving the result 0 for when I attempt to create a Digital Signature! ):
+When running tests, when attempting to pass the calculated new post-shifted message to the packet, it keeps giving back null.
