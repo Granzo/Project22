@@ -68,6 +68,13 @@ public class RSA implements RSAADT
 	{
 		return N;
 	}
+	
+	public BigInteger getE()
+	{
+		return e;
+	}
+	
+	
 
 	//This is for returning a private and public key. This method would normally NEVER be available to the public, but for this project, it is there
 	//for checking for clarity
